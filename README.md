@@ -1,3 +1,19 @@
+# How to start
+
+```bash
+pip install -r requirements.txt
+```
+
+Create `.env` file in the root of project:
+```bash
+PROJECT_NAME='Your-name-for-this-project'
+```
+
+Run server
+```bash
+ uvicorn src.main:app --host 0.0.0.0 --port 8080
+```
+
 # Проектное задание четвёртого спринта
 
 Спроектируйте и реализуйте сервис для создания сокращённой формы передаваемых URL и анализа активности их использования.
