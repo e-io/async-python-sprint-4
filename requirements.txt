@@ -3,4 +3,4 @@ fastapi==0.93.0
 pydantic==1.9.0
 python-dotenv==1.0.1
 uvicorn==0.18.2
-uvloop==0.14.0; sys_platform != "win32" and implementation_name == "cpython"
+uvloop==0.17.0; sys_platform != "win32" and implementation_name == "cpython"
