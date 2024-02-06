@@ -36,6 +36,37 @@ Open any link in any browser
  * ReDoc http://127.0.0.1:8080/redoc
  * OpenAPI documentation (json) http://127.0.0.1:8080/openapi.json
 
+## A tidy up and a health check
+
+Install additional "developer's" requirements
+```bash
+pip install -r requirements-dev.txt
+```
+
+A linter
+```bash
+ruff src
+```
+
+A linter's fixing tool
+```bash
+ruff src --fix
+```
+
+A formatter
+```bash
+ruff format src
+```
+
+A default 'health-checking' linter
+```bash
+flake8 src
+```
+
+A static type checker tool
+```bash
+mypy src
+```
 
 # Проектное задание четвёртого спринта
 
