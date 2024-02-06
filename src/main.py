@@ -1,4 +1,9 @@
 """
+Run through console:
+
+uvicorn src.main:app --host 127.0.0.1 --port 8080
+additional notes are in the `../README.md` file
+
 Routs which work "from the box":
 
 docs_url: "/docs" - Swagger
