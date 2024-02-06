@@ -1,0 +1,5 @@
+
+flake8
+mypy
+ruff
+watchgod==0.8.2

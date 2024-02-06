@@ -1,3 +1,73 @@
+# URLer - Uniform Resource Locator shortener.
+
+## How to start
+
+Use python 3.9 or 3.10.
+
+Create virtual environment
+```bash
+pip3 install virtualenv
+python3 -m virtualenv venv -p python3
+source venv/bin/activate
+```
+Install dependencies
+```bash
+pip install -r requirements.txt
+```
+The module `uvloop==0.14.0` is not being installed with python 3.11 due to an error `Could not build wheels for uvloop`.
+But it works with 3.10.
+
+Create `.env` file in the root of project:
+```bash
+PROJECT_NAME='Your-name-for-this-project'
+```
+e.g. set a name `PROJECT_NAME='URLer'`.
+
+**Run server**
+```bash
+ uvicorn src.main:app --host 127.0.0.1 --port 8080
+```
+_Note: 0.0.0.0 may not work in Safari browser_
+
+## How to test
+Open any link in any browser
+
+ * Swagger http://127.0.0.1:8080/docs
+ * ReDoc http://127.0.0.1:8080/redoc
+ * OpenAPI documentation (json) http://127.0.0.1:8080/openapi.json
+
+## A tidy up and a health check
+
+Install additional "developer's" requirements
+```bash
+pip install -r requirements-dev.txt
+```
+
+A linter
+```bash
+ruff src
+```
+
+A linter's fixing tool
+```bash
+ruff src --fix
+```
+
+A formatter
+```bash
+ruff format src
+```
+
+A default 'health-checking' linter
+```bash
+flake8 src
+```
+
+A static type checker tool
+```bash
+mypy src
+```
+
 # Проектное задание четвёртого спринта
 
 Спроектируйте и реализуйте сервис для создания сокращённой формы передаваемых URL и анализа активности их использования.
@@ -35,7 +105,7 @@ GET /<shorten-url-id>/status?[full-info]&[max-result=10]&[offset=0]
 
 Метод принимает в качестве параметра идентификатор сокращённого URL и возвращает информацию о количестве переходов, совершенных по ссылке.
 
-В ответе может содержаться как общее количество совершенных переходов, так и дополнительная детализированная информация о каждом переходе (наличие **query**-параметра **full-info** и параметров пагинации):
+В ответе может содержаться как **общее количество совершенных переходов**, так и дополнительная детализированная информация о каждом переходе (наличие **query**-параметра **full-info** и параметров пагинации):
 - дата и время перехода/использования ссылки;
 - информация о клиенте, выполнившем запрос;
 
@@ -44,10 +114,10 @@ GET /<shorten-url-id>/status?[full-info]&[max-result=10]&[offset=0]
 
 ## Дополнительные требования (отметьте [Х] выбранные пункты):
 
-- [ ] (1 балл) Реализуйте метод `GET /ping`, который возвращает информацию о статусе доступности БД.
-- [ ] (1 балл) Реализуйте возможность «удаления» сохранённого URL. Запись должна остаться, но помечаться как удалённая. При попытке получения полного URL возвращать ответ с кодом `410 Gone`.
+- [x] (1 балл) Реализуйте метод `GET /ping`, который возвращает информацию о статусе доступности БД.
+- [x] (1 балл) Реализуйте возможность «удаления» сохранённого URL. Запись должна остаться, но помечаться как удалённая. При попытке получения полного URL возвращать ответ с кодом `410 Gone`.
 - [ ] (2 балла) Реализуйте middlware, блокирующий доступ к сервису из запрещённых подсетей (black list).
-- [ ] (2 балла) Реализуйте возможность передавать ссылки пачками (batch upload).
+- [x] (2 балла) Реализуйте возможность передавать ссылки пачками (batch upload).
 
 <details>
 <summary> Описание изменений </summary>
