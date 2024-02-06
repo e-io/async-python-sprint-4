@@ -5,7 +5,6 @@ docs_url: "/docs" - Swagger
 redoc_url: "/redoc" - ReDoc
 openapi_url: "/openapi.json" - OpenAPI documentation
 """
-import uvicorn
 from fastapi import FastAPI
 
 from src.core import config
@@ -20,4 +19,3 @@ def get_application():
 
 
 app = get_application()
-
