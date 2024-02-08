@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import logging
+import json
+from asyncio import sleep
 
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
-from src.models.base import UrlModel, RecordModel
+from src.models.base import UrlModel, IdModel, RecordModel
 from src.services.base import CRUD
 
 logger = logging.getLogger(__name__)
@@ -36,17 +38,21 @@ async def shorten_links():
 
 
 @router.get('/link')
-async def return_link(id: str):
+async def return_link(url_id: str):
     """return full link by id"""
-    ...
-    return {'response': 'Not implemented'}
+    logger.debug('id: %s', url_id)
+    record: RecordModel = CRUD.read_record(url_id)
+    url = record.url_full
+    return {'url_full': url}
 
 
 @router.get('/info')
-async def info(id: str):
+async def info(url_id: str):
     """info about one link"""
-    ...
-    return {'response': 'Not implemented'}
+    logger.debug('id: %s', url_id)
+    # /info does not increase the usage of link
+    record: RecordModel = CRUD.read_record(url_id, incr=False)
+    return json.loads(record.json())
 
 
 @router.get('/all')

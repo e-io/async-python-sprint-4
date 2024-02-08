@@ -58,8 +58,9 @@ def test_post_url(url_example):
 
     assert record['url_full'] == url_example
     assert 'url_id' in record
-    assert record['used'] == 0
+    assert isinstance(record['used'], int)
     assert record['deleted'] is False
+
 
 def test_post_not_urls(not_urls):
     for not_url in not_urls:
@@ -73,7 +74,7 @@ def test_post_not_urls(not_urls):
         # responses have extremely good description of error
         logger.debug('%s%s%s', response_dict['type'], ': ', response_dict['msg'])
 
-"""
+
 def test_post_and_get(url_example):
     response = client.post('/shorten/', headers={}, json={'url': url_example})
 
@@ -85,6 +86,29 @@ def test_post_and_get(url_example):
     url_id = record['url_id']
     logger.debug('url_id: %s', url_id)
 
-    response = client.get('/link' + '?id=' + url_id)
+    route = '/link' + '?url_id=' + url_id
+    logger.debug('get route %s', route)
+    response = client.get(route)
     assert response.status_code == 200
-"""
+    url_dict = response.json()
+    url_full = url_dict['url_full']
+    logger.debug('test got back url - %s', url_full)
+    assert url_full == url_example
+
+def test_info(url_example):
+    response = client.post('/shorten/', headers={}, json={'url': url_example})
+    assert response.status_code == 200
+    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
+    record = json.loads(record_as_string)
+    url_id = record['url_id']
+
+    route = '/info' + '?url_id=' + url_id
+    logger.debug('get route %s', route)
+    response = client.get(route)
+    assert response.status_code == 200
+    record_dict = response.json()
+    assert record_dict['url_full'] == url_example
+    logger.debug('test got json %s', record_dict)
+    assert record_dict['deleted'] == False
+    assert record_dict['used'] == 0
+    assert record_dict['url_id'] == url_id

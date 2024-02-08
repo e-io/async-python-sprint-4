@@ -1,9 +1,8 @@
 from hashlib import sha256
 
 from fastapi import HTTPException
-from pydantic import BaseModel, HttpUrl
 
-from src.models.base import UrlModel, RecordModel
+from src.models.base import LENGTH, IdModel, RecordModel, UrlModel
 
 
 class DB:
@@ -13,7 +12,6 @@ class DB:
 class CRUD:
     @staticmethod
     def _create_id(string: str):
-        LENGTH = 3
         return sha256(string.encode()).hexdigest()[0:LENGTH]
 
 
@@ -32,5 +30,18 @@ class CRUD:
                 )
         record = RecordModel(url_id=id, url_full=link.url, used=0, deleted=False)
         DB.data[id] = record
-
         return DB.data[id]
+
+    @staticmethod
+    def read_record(id_: IdModel, incr=True):
+        """
+        incr: in the most cases we increment
+        the number of usage of the link
+        """
+        if id_ not in DB.data:
+            return HTTPException(status_code=404, detail=f'There is no a link with this id {id_}')
+
+        if incr:
+            DB.data[id_].used += 1
+
+        return DB.data[id_]
