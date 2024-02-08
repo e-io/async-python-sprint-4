@@ -17,7 +17,7 @@ logger.setLevel('DEBUG')
 router = APIRouter()
 
 
-@router.post('/shorten/')
+@router.post('/shorten/', status_code=201)
 async def shorten_link(link: UrlModel):
     """save link and return id"""
     logger.debug('link: %s', link.url)
@@ -36,7 +36,8 @@ async def shorten_links():
     ...
     return {'response': 'Not implemented'}
 
-@router.get('/link')
+
+@router.get('/link', status_code=307)
 async def return_link(url_id: str):
     """return full link by id"""
     logger.debug('id: %s', url_id)
@@ -54,11 +55,11 @@ async def info(url_id: str):
     record: RecordModel = CRUD.read_record(url_id, incr=False)
     return json.loads(record.json())
 
-@router.patch('/deprecate')
+@router.patch('/deprecate', status_code=200)
 async def deprecate(url_id: str):
     """to deprecate (or "delete") a link"""
     record: RecordModel = CRUD.deprecate_record(url_id)
-    return 200
+    return {}
 
 
 @router.get('/all')

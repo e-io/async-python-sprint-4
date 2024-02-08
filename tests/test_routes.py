@@ -50,7 +50,7 @@ def test_post_url(url_example):
     logger.debug('URL example: %s', url_example)
     response = client.post('/shorten/', headers={}, json={'url': url_example})
     sleep(1)
-    assert response.status_code == 200
+    assert response.status_code == 201
     record_as_string = response.json()  # response.json() has a type <str>! (not dict)
     record = json.loads(record_as_string)
     logger.debug(type(record))  # dict
@@ -78,7 +78,7 @@ def test_post_not_urls(not_urls):
 def test_post_and_get(url_example):
     response = client.post('/shorten/', headers={}, json={'url': url_example})
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     record_as_string = response.json()  # response.json() has a type <str>! (not dict)
     record = json.loads(record_as_string)
 
@@ -89,7 +89,7 @@ def test_post_and_get(url_example):
     route = '/link' + '?url_id=' + url_id
     logger.debug('get route %s', route)
     response = client.get(route)
-    assert response.status_code == 200
+    assert response.status_code == 307
     url_dict = response.json()
     url_full = url_dict['url_full']
     logger.debug('test got back url - %s', url_full)
@@ -97,7 +97,7 @@ def test_post_and_get(url_example):
 
 def test_info(url_example):
     response = client.post('/shorten/', headers={}, json={'url': url_example})
-    assert response.status_code == 200
+    assert response.status_code == 201
     record_as_string = response.json()  # response.json() has a type <str>! (not dict)
     record = json.loads(record_as_string)
     url_id = record['url_id']
@@ -115,7 +115,7 @@ def test_info(url_example):
 
 def test_deprecated(url_example):
     response = client.post('/shorten/', headers={}, json={'url': url_example})
-    assert response.status_code == 200
+    assert response.status_code == 201
     record_as_string = response.json()  # response.json() has a type <str>! (not dict)
     record = json.loads(record_as_string)
     url_id = record['url_id']
