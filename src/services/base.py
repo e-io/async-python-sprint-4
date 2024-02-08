@@ -14,7 +14,6 @@ class CRUD:
     def _create_id(string: str):
         return sha256(string.encode()).hexdigest()[0:LENGTH]
 
-
     @staticmethod
     def create_record(link: UrlModel):
         # id is a short link
@@ -26,7 +25,8 @@ class CRUD:
             count -= 1
             if count == 0:
                 raise HTTPException(
-                    status_code=500, detail='Server could not create a hashsum for a short link'
+                    status_code=500,
+                    detail='Server could not create a hashsum for a short link',
                 )
         record = RecordModel(url_id=id, url_full=link.url, used=0, deprecated=False)
         DB.data[id] = record
@@ -39,9 +39,15 @@ class CRUD:
         the number of usage of the link
         """
         if id_ not in DB.data:
-            raise HTTPException(status_code=404, detail=f'There is no a link with this id {id_}')
+            raise HTTPException(
+                status_code=404,
+                detail=f'There is no a link with this id {id_}'
+            )
         if DB.data[id_].deprecated is True:
-            raise HTTPException(status_code=410, detail=f'Gone. This short link {id_} is deprecated forever')
+            raise HTTPException(
+                status_code=410,
+                detail=f'Gone. This short link {id_} is deprecated forever',
+            )
 
         if incr:
             DB.data[id_].used += 1
@@ -51,7 +57,10 @@ class CRUD:
     @staticmethod
     def deprecate_record(id_: IdModel):
         if id_ not in DB.data:
-            raise HTTPException(status_code=404, detail=f'There is no a link with this id {id_}')
+            raise HTTPException(
+                status_code=404,
+                detail=f'There is no a link with this id {id_}'
+            )
 
         DB.data[id_].deprecated = True
 

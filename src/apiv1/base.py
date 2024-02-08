@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import logging
 import json
-from asyncio import sleep
+import logging
 
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
-from src.models.base import UrlModel, IdModel, RecordModel
+from src.models.base import RecordModel, UrlModel
 from src.services.base import CRUD
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ async def shorten_link(link: UrlModel):
     try:
         UrlModel(url=link.url)
     except ValidationError:
-        raise HTTPException(status_code=422, detail="Input data is not a link")
+        raise HTTPException(status_code=422, detail='Input data is not a link')
     record: RecordModel = CRUD.create_record(link=link)
 
     return record.json()
@@ -54,6 +53,7 @@ async def info(url_id: str):
     # /info does not increase the usage of link
     record: RecordModel = CRUD.read_record(url_id, incr=False)
     return json.loads(record.json())
+
 
 @router.patch('/deprecate', status_code=200)
 async def deprecate(url_id: str):
