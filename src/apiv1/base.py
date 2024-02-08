@@ -58,7 +58,7 @@ async def info(url_id: str):
 @router.patch('/deprecate', status_code=200)
 async def deprecate(url_id: str):
     """to deprecate (or "delete") a link"""
-    record: RecordModel = CRUD.deprecate_record(url_id)
+    CRUD.deprecate_record(url_id)
     return {}
 
 

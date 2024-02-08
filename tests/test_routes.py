@@ -1,12 +1,10 @@
-import logging
 import json
+import logging
 from time import sleep
-import requests
 
 from fastapi.testclient import TestClient
-from pytest import fixture
-
 from main import app
+from pytest import fixture
 
 client = TestClient(app)
 
@@ -18,6 +16,7 @@ logger.addHandler(logging.StreamHandler())
 @fixture
 def url_example():
     return 'https://example.com'
+
 
 @fixture
 def not_urls():
@@ -96,6 +95,7 @@ def test_post_and_get(url_example):
     logger.debug('test got back url - %s', url_full)
     assert url_full == url_example
 
+
 def test_info(url_example):
     response = client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
@@ -110,9 +110,10 @@ def test_info(url_example):
     record_dict = response.json()
     assert record_dict['url_full'] == url_example
     logger.debug('test got json %s', record_dict)
-    assert record_dict['deprecated'] == False
+    assert record_dict['deprecated'] is False
     assert record_dict['used'] == 0
     assert record_dict['url_id'] == url_id
+
 
 def test_deprecated(url_example):
     response = client.post('/shorten/', headers={}, json={'url': url_example})
