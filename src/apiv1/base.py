@@ -5,8 +5,8 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
-from src.models.base import UrlModel
-from src.services.base import CRUD, DB, URL
+from src.models.base import UrlModel, RecordModel
+from src.services.base import CRUD
 
 logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
@@ -23,9 +23,9 @@ async def shorten_link(link: UrlModel):
         UrlModel(url=link.url)
     except ValidationError:
         raise HTTPException(status_code=422, detail="Input data is not a link")
-    result: URL = CRUD.create_URL(link=link)
+    record: RecordModel = CRUD.create_Record(link=link)
 
-    return {'link': link.url}  # result.json()
+    return record.json()
 
 
 @router.post('/shorten-batch')

@@ -3,14 +3,7 @@ from hashlib import sha256
 from fastapi import HTTPException
 from pydantic import BaseModel, HttpUrl
 
-from src.models.base import UrlModel
-
-
-class URL(BaseModel):
-    url_id: str
-    url_full: HttpUrl
-    used: int = 0  # how many times this link was used
-    deleted: bool = False
+from src.models.base import UrlModel, RecordModel
 
 
 class DB:
@@ -19,18 +12,25 @@ class DB:
 
 class CRUD:
     @staticmethod
-    def create_URL(link: UrlModel):
+    def _create_id(string: str):
+        LENGTH = 3
+        return sha256(string.encode()).hexdigest()[0:LENGTH]
+
+
+    @staticmethod
+    def create_Record(link: UrlModel):
         # id is a short link
-        id = sha256(link.url.encode()).hexdigest()[0:6]
-        count = 100
+        id = CRUD._create_id(link.url)
+        MAX_ATTEMPTS = 128
+        count = MAX_ATTEMPTS
         while id in DB.data.keys():
-            id = sha256(id.encode()).hexdigest()[0:6]
+            id = CRUD._create_id(id)
             count -= 1
             if count == 0:
                 raise HTTPException(
-                    status_code=500, detail='Server could not create a hashsum'
+                    status_code=500, detail='Server could not create a hashsum for a short link'
                 )
-        url = URL(url_id=id, url_full=link.url, used=0, deleted=False)
-        DB.data[id] = url
+        record = RecordModel(url_id=id, url_full=link.url, used=0, deleted=False)
+        DB.data[id] = record
 
         return DB.data[id]

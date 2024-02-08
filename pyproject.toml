@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
-addopts = '-sv'
+addopts = 'tests/test_routes.py::test_post_url tests/test_routes.py::test_post_and_get -sv --capture=no'
 pythonpath = 'src/'
+# testpaths = ['tests/', ]  # not needed
 
 [tool.ruff.lint]
 extend-select=['I']
