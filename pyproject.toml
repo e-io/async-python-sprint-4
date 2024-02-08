@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
-addopts = '-sv'
-pythonpath = '.'
+addopts = '-sv --capture=no'
+pythonpath = 'src/'
+# testpaths = ['tests/', ]  # not needed
 
 [tool.ruff.lint]
 extend-select=['I']

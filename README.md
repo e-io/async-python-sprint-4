@@ -30,11 +30,20 @@ e.g. set a name `PROJECT_NAME='URLer'`.
 _Note: 0.0.0.0 may not work in Safari browser_
 
 ## How to test
+
+### In browser
 Open any link in any browser
 
  * Swagger http://127.0.0.1:8080/docs
  * ReDoc http://127.0.0.1:8080/redoc
  * OpenAPI documentation (json) http://127.0.0.1:8080/openapi.json
+
+### With pytest and TestClient
+Run all tests by
+```
+pytest
+```
+or create your own tests in `tests` folder. You may use tests in `test_routes.py` as template for your tests.
 
 ## A tidy up and a health check
 
