@@ -1,5 +1,5 @@
 [tool.pytest.ini_options]
-addopts = 'tests/test_routes.py::test_post_and_get tests/test_routes.py::test_info -sv --capture=no'
+addopts = 'tests/test_routes.py::test_info tests/test_routes.py::test_deprecated -sv --capture=no'
 pythonpath = 'src/'
 # testpaths = ['tests/', ]  # not needed
 

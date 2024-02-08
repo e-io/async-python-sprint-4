@@ -25,7 +25,7 @@ async def shorten_link(link: UrlModel):
         UrlModel(url=link.url)
     except ValidationError:
         raise HTTPException(status_code=422, detail="Input data is not a link")
-    record: RecordModel = CRUD.create_Record(link=link)
+    record: RecordModel = CRUD.create_record(link=link)
 
     return record.json()
 
@@ -36,12 +36,12 @@ async def shorten_links():
     ...
     return {'response': 'Not implemented'}
 
-
 @router.get('/link')
 async def return_link(url_id: str):
     """return full link by id"""
     logger.debug('id: %s', url_id)
     record: RecordModel = CRUD.read_record(url_id)
+    logger.debug(record)
     url = record.url_full
     return {'url_full': url}
 
@@ -53,6 +53,12 @@ async def info(url_id: str):
     # /info does not increase the usage of link
     record: RecordModel = CRUD.read_record(url_id, incr=False)
     return json.loads(record.json())
+
+@router.patch('/deprecate')
+async def deprecate(url_id: str):
+    """to deprecate (or "delete") a link"""
+    record: RecordModel = CRUD.deprecate_record(url_id)
+    return 200
 
 
 @router.get('/all')

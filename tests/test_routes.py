@@ -59,7 +59,7 @@ def test_post_url(url_example):
     assert record['url_full'] == url_example
     assert 'url_id' in record
     assert isinstance(record['used'], int)
-    assert record['deleted'] is False
+    assert record['deprecated'] is False
 
 
 def test_post_not_urls(not_urls):
@@ -109,6 +109,21 @@ def test_info(url_example):
     record_dict = response.json()
     assert record_dict['url_full'] == url_example
     logger.debug('test got json %s', record_dict)
-    assert record_dict['deleted'] == False
+    assert record_dict['deprecated'] == False
     assert record_dict['used'] == 0
     assert record_dict['url_id'] == url_id
+
+def test_deprecated(url_example):
+    response = client.post('/shorten/', headers={}, json={'url': url_example})
+    assert response.status_code == 200
+    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
+    record = json.loads(record_as_string)
+    url_id = record['url_id']
+
+    route = '/deprecate' + '?url_id=' + url_id
+    response = client.patch(route)
+    assert response.status_code == 200
+
+    route = '/link' + '?url_id=' + url_id
+    response = client.get(route)
+    assert response.status_code == 410  # as it should be

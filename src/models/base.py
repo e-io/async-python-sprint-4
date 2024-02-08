@@ -15,4 +15,4 @@ class RecordModel(BaseModel):
     url_id: str = Field(min_length=LENGTH, max_length=LENGTH)
     url_full: HttpUrl
     used: int = 0  # how many times this link was used
-    deleted: bool = False
+    deprecated: bool = False
