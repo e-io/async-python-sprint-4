@@ -66,7 +66,8 @@ def test_post_not_urls(not_urls):
     for not_url in not_urls:
         response = client.post('/shorten/', headers={}, json={'url': not_url})
 
-        assert isinstance(response, requests.models.Response)
+        # is not true for the last libraries OR python 3.11
+        # assert isinstance(response, requests.models.Response)
         assert response.status_code == 422
 
         response_dict = json.loads(response.text)

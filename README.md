@@ -2,7 +2,7 @@
 
 ## How to start
 
-Use python 3.9 or 3.10.
+Use python 3.10 or 3.11.
 
 Create virtual environment
 ```bash
@@ -17,11 +17,11 @@ pip install -r requirements.txt
 The module `uvloop==0.14.0` is not being installed with python 3.11 due to an error `Could not build wheels for uvloop`.
 But it works with 3.10.
 
-Create `.env` file in the root of project:
+Create `.env` file in the root of project with `PROJECT_NAME='Your-name-for-this-project'`
 ```bash
-PROJECT_NAME='Your-name-for-this-project'
+touch .env
+echo "PROJECT_NAME='URLer'" > .env
 ```
-e.g. set a name `PROJECT_NAME='URLer'`.
 
 **Run server**
 ```bash
@@ -40,7 +40,7 @@ Open any link in any browser
 
 ### With pytest and TestClient
 Run all tests by
-```
+```bash
 pytest
 ```
 or create your own tests in `tests` folder. You may use tests in `test_routes.py` as template for your tests.
