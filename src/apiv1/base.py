@@ -1,13 +1,13 @@
+# for python 3.9
 from __future__ import annotations
 
-import logging
 import json
-from asyncio import sleep
+import logging
 
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
-from src.models.base import UrlModel, IdModel, RecordModel
+from src.models.base import RecordModel, UrlModel
 from src.services.base import CRUD
 
 logger = logging.getLogger(__name__)
@@ -24,17 +24,10 @@ async def shorten_link(link: UrlModel):
     try:
         UrlModel(url=link.url)
     except ValidationError:
-        raise HTTPException(status_code=422, detail="Input data is not a link")
+        raise HTTPException(status_code=422, detail='Input data is not a link')
     record: RecordModel = CRUD.create_record(link=link)
 
     return record.json()
-
-
-@router.post('/shorten-batch')
-async def shorten_links():
-    """batch upload - save many link and return their ids"""
-    ...
-    return {'response': 'Not implemented'}
 
 
 @router.get('/link', status_code=307)
@@ -55,16 +48,17 @@ async def info(url_id: str):
     record: RecordModel = CRUD.read_record(url_id, incr=False)
     return json.loads(record.json())
 
+
 @router.patch('/deprecate', status_code=200)
 async def deprecate(url_id: str):
     """to deprecate (or "delete") a link"""
-    record: RecordModel = CRUD.deprecate_record(url_id)
+    CRUD.deprecate_record(url_id)
     return {}
 
 
-@router.get('/all')
-async def return_all_links():
-    """return info about all links (just for debugging)"""
+@router.post('/shorten-batch')
+async def shorten_links():
+    """batch upload - save many link and return their ids"""
     ...
     return {'response': 'Not implemented'}
 

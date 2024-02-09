@@ -1,5 +1,5 @@
 """
-This logging configuration was copied from the source without changes
+This logging configuration was copied from one source without changes
 
 It sets logging of uvicorn-server
 More information:

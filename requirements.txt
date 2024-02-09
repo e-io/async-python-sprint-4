@@ -1,6 +1,7 @@
-
-fastapi==0.93.0
-pydantic==1.9.0
-python-dotenv==1.0.1
-uvicorn==0.18.2
-uvloop==0.17.0; sys_platform != "win32" and implementation_name == "cpython"
+fastapi~=0.109.2
+pydantic~=1.10
+python-dotenv~=1.0.1
+uvicorn~=0.27.0
+uvloop~=0.19.0; sys_platform != "win32" and implementation_name == "cpython"
+httpx~=0.26.0
+pytest~=7.0
