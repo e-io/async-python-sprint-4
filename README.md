@@ -2,7 +2,7 @@
 
 ## How to start
 
-Use python 3.9 or 3.10.
+Use python 3.10 or 3.11.
 
 Create virtual environment
 ```bash
@@ -17,11 +17,11 @@ pip install -r requirements.txt
 The module `uvloop==0.14.0` is not being installed with python 3.11 due to an error `Could not build wheels for uvloop`.
 But it works with 3.10.
 
-Create `.env` file in the root of project:
+Create `.env` file in the root of project with `PROJECT_NAME='Your-name-for-this-project'`
 ```bash
-PROJECT_NAME='Your-name-for-this-project'
+touch .env
+echo "PROJECT_NAME='URLer'" > .env
 ```
-e.g. set a name `PROJECT_NAME='URLer'`.
 
 **Run server**
 ```bash
@@ -30,11 +30,20 @@ e.g. set a name `PROJECT_NAME='URLer'`.
 _Note: 0.0.0.0 may not work in Safari browser_
 
 ## How to test
+
+### In browser
 Open any link in any browser
 
  * Swagger http://127.0.0.1:8080/docs
  * ReDoc http://127.0.0.1:8080/redoc
  * OpenAPI documentation (json) http://127.0.0.1:8080/openapi.json
+
+### With pytest and TestClient
+Run all tests by
+```bash
+pytest
+```
+or create your own tests in `tests` folder. You may use tests in `test_routes.py` as template for your tests.
 
 ## A tidy up and a health check
 
@@ -67,6 +76,48 @@ A static type checker tool
 ```bash
 mypy src
 ```
+
+# Тому кто будет это читать
+
+## Способности проекта
+
+Проект может:
+ - генерировать случайные короткие ссылки (точнее, айдишки - из четырех 16-ричных цифр) - 
+```
+POST `/shorten` json={'url': <ссылка>}
+```
+ - выдавать полную ссылку по короткой ссылке 
+```
+GET `/link?url_id=abcd`
+```
+ - подсчитывать число переходов по ссылке (`RecordModel->used`)
+ - удалять (deprecate) ссылки. Операция безвозвратная
+```
+PATCH `/deprecate?url_id=abcd`
+```
+ - выдавать запись из базы данных о ссылке 
+```
+GET `/info?url_id=abcd`
+```
+ - выдавать ошибки. Например, при попытке передать неверную ссылку (например, "https://example .com")
+
+
+## Результаты
+
+В ходе работы над этим заданием автору удалось **впервые**:
+ - [x] Полноценно поработать с FastApi и подобными фреймворками в принципе
+ - [x] Опробовать всю магию pydantic - действительно удобный инструмент как о нём ходили слухи
+ - [x] Писать Post- и Patch- запросы
+ - [x] Поработать с сопутствующими технологиями как uvicorn, FastApi TestClient и др. 
+
+Хотелось, но не удалось впервые применить (из-за нехватки времени на эти новые технологии):
+ - [ ] работу с базой данных через ORM (в частности, SqlAlchemy) - вместо написаний каноничных SQL-запросов
+ - [ ] внедрить базу данных в свой проект
+ - [ ] понять чем схемы отличаются от моделей
+
+На данный момент в качестве базы данных используется обычный словарь (класс `BD`), 
+в котором ключу-айдишнику сопоставляется запись "базы данных".
+
 
 # Проектное задание четвёртого спринта
 

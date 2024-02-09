@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 addopts = '-sv'
-pythonpath = '.'
+pythonpath = 'src/'
 
 [tool.ruff.lint]
 extend-select=['I']

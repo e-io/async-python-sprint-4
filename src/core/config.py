@@ -1,12 +1,12 @@
-"""
-Run through console:
-
-uvicorn src.main:app --host 127.0.0.1 --port 8080
-additional notes are in the `../README.md` file
-"""
+from logging import config as logging_config
 from pathlib import Path
 
 from pydantic import BaseSettings
+
+from .logger import LOGGING
+
+# logging settings
+logging_config.dictConfig(LOGGING)
 
 BASE_DIR = Path.cwd().parent.parent
 # print('BASE_DIR', BASE_DIR)
