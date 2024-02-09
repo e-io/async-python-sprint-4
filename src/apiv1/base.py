@@ -1,3 +1,4 @@
+# for python 3.9
 from __future__ import annotations
 
 import json
@@ -29,13 +30,6 @@ async def shorten_link(link: UrlModel):
     return record.json()
 
 
-@router.post('/shorten-batch')
-async def shorten_links():
-    """batch upload - save many link and return their ids"""
-    ...
-    return {'response': 'Not implemented'}
-
-
 @router.get('/link', status_code=307)
 async def return_link(url_id: str):
     """return full link by id"""
@@ -62,9 +56,9 @@ async def deprecate(url_id: str):
     return {}
 
 
-@router.get('/all')
-async def return_all_links():
-    """return info about all links (just for debugging)"""
+@router.post('/shorten-batch')
+async def shorten_links():
+    """batch upload - save many link and return their ids"""
     ...
     return {'response': 'Not implemented'}
 
