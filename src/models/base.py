@@ -1,5 +1,5 @@
 from pydantic import BaseModel, HttpUrl
-from sqlmodel import SQLModel, Field
+from sqlmodel import Field, SQLModel
 
 LENGTH = 4
 

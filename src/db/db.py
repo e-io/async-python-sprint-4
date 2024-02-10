@@ -1,11 +1,8 @@
-import asyncio
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import create_engine, Session, select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 async def prepare_engine(dsn: str, echo=False):
@@ -21,6 +18,7 @@ async def prepare_engine(dsn: str, echo=False):
         await conn.run_sync(SQLModel.metadata.create_all)
 
     return engine
+
 
 async def prepare_session(dsn: str, echo=False):
     engine = await prepare_engine(dsn, echo)

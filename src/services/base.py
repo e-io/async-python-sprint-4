@@ -4,12 +4,10 @@ import asyncio
 from hashlib import sha256
 
 from fastapi import HTTPException
-
-from src.models.base import LENGTH, IdModel, RecordModel, UrlModel
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
+from src.models.base import LENGTH, IdModel, RecordModel, UrlModel
 
 
 class DB:
@@ -17,7 +15,6 @@ class DB:
 
 
 class CRUD:
-
     @staticmethod
     async def _all_ids_future(db: AsyncSession):
         async with db as session:
@@ -63,7 +60,7 @@ class CRUD:
         async with db as session:
             session.add(record)
             await session.commit()
-            asyncio.sleep(0.25)
+            await asyncio.sleep(0.25)
 
         DB.data[id] = record
         return DB.data[id]

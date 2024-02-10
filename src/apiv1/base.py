@@ -8,17 +8,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import ValidationError
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from src.db.db import get_session
 from src.models.base import RecordModel, UrlModel
 from src.services.base import CRUD
-
-from src.db.db import get_session
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
 
 
 router = APIRouter()
+
 
 @router.post('/shorten/', status_code=201)
 async def shorten_link(*, db: AsyncSession = Depends(get_session), link: UrlModel):
