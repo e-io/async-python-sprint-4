@@ -1,6 +1,6 @@
 # URLer - Uniform Resource Locator shortener.
 
-## How to start
+## How to prepare environment
 
 Use python 3.10 or 3.11.
 
@@ -14,14 +14,40 @@ Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
-The module `uvloop==0.14.0` is not being installed with python 3.11 due to an error `Could not build wheels for uvloop`.
-But it works with 3.10.
+
+
+## How to prepare a database
+
+Install PostgreSQL from the official site with an elephant as the logo.
+
+Install Rancher Desktop (or another similar software).
+
+Rancher Desktop will install a required software by itself.
+
+Rancher Desktop --> Settings --> Container engine --> dockerd (moby)
+
+Run a container for PostgreSQL by a following command (just in a standard terminal):
+```
+docker run \
+  --rm   \
+  --name postgres-fastapi \
+  -p 5432:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=collection \
+  -d postgres:14.5
+```
+Use these username and password only for a local running. For a real server choose more sophisticated password.
 
 Create `.env` file in the root of project with `PROJECT_NAME='Your-name-for-this-project'`
 ```bash
 touch .env
 echo "PROJECT_NAME='URLer'" > .env
+echo "DATABASE_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/postgres" > .env
 ```
+
+
+## How to run
 
 **Run server**
 ```bash
