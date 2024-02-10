@@ -32,5 +32,10 @@ async def prepare_session(dsn: str, echo=False):
     return async_session
 
 
+async def get_session() -> AsyncSession:
+    dsn = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres'
 
+    async_session = await prepare_session(dsn=dsn, echo=False)
 
+    async with async_session() as session:
+        yield session

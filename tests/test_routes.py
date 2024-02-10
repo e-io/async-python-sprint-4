@@ -17,6 +17,14 @@ logger.addHandler(logging.StreamHandler())
 def url_example():
     return 'https://example.com'
 
+@fixture
+def url_several():
+    _urls = [
+        'https://example.com/contacts',
+        'https://example.com/info?key=true&list=10',
+        'http://example.com/a/b',
+    ]
+    return _urls
 
 @fixture
 def not_urls():
