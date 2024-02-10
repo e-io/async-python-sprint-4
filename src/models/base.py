@@ -25,17 +25,20 @@ import asyncio
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from db import prepare_engine
+from db import prepare_session
 
 async def function_example():
     dsn = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres'
 
-    engine = await prepare_engine(dsn=dsn, echo=False)
+    #engine = await prepare_engine(dsn=dsn, echo=False)
+    async_session = await prepare_session(dsn=dsn, echo=False)
 
     record1 = RecordModel(url_id='abcd', url_full='https://example.com')
     record2 = RecordModel(url_id='1234', url_full='https://example.com/info?key=true&list=10')
 
-    async with AsyncSession(engine) as session:
+    print("I am here")
+
+    async with async_session() as session:
         session.add(record1)
         session.add(record2)
 
@@ -44,7 +47,7 @@ async def function_example():
     await asyncio.sleep(1)
 
     url_id1 = 'abcd'
-    async with AsyncSession(engine) as session:
+    async with async_session() as session:
         statement = select(RecordModel).where(RecordModel.url_id == url_id1)
         records = await session.execute(statement)
         record = records.first()
