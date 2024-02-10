@@ -27,7 +27,7 @@ Rancher Desktop will install a required software by itself.
 Rancher Desktop --> Settings --> Container engine --> dockerd (moby)
 
 Run a container for PostgreSQL by a following command (just in a standard terminal):
-```
+```bash
 docker run \
   --rm   \
   --name postgres-fastapi \
@@ -70,6 +70,20 @@ Run all tests by
 pytest
 ```
 or create your own tests in `tests` folder. You may use tests in `test_routes.py` as template for your tests.
+
+### In docker container
+Use the next command to connect to the terminal of runned container
+```bash
+docker exec -it postgres-fastapi psql -U postgres 
+```
+To show all databases
+```bash
+\dt
+```
+To show all records in a database `recordmodel`
+```
+SELECT * FROM recordmodel;
+```
 
 ## A tidy up and a health check
 

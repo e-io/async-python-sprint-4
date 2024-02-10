@@ -22,18 +22,15 @@ class RecordModel(SQLModel, table=True):
 
 
 import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import create_engine, Session, select
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from db import prepare_engine
 
 async def function_example():
-    engine = create_async_engine('postgresql+asyncpg://postgres:postgres@localhost:5432/postgres')
+    dsn = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres'
 
-    # init models
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.drop_all)
-        await conn.run_sync(SQLModel.metadata.create_all)
+    engine = await prepare_engine(dsn=dsn, echo=False)
 
     record1 = RecordModel(url_id='abcd', url_full='https://example.com')
     record2 = RecordModel(url_id='1234', url_full='https://example.com/info?key=true&list=10')
