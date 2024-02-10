@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, HttpUrl
+from sqlmodel import SQLModel, Field
 
 LENGTH = 4
 
@@ -11,10 +12,10 @@ class IdModel(BaseModel):
     id: str = Field(min_length=LENGTH, max_length=LENGTH)
 
 
-class RecordModel(BaseModel):
+class RecordModel(SQLModel, table=True):
     """entity model for "database"""
 
-    url_id: str = Field(min_length=LENGTH, max_length=LENGTH)
+    url_id: str = Field(min_length=LENGTH, max_length=LENGTH, primary_key=True)
     url_full: HttpUrl
     used: int = 0  # how many times this link was used
     deprecated: bool = False
