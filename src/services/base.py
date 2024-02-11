@@ -25,11 +25,20 @@ class CRUD:
         statement = select([RecordModel.url_id])
         all_ids_iterator = await db.execute(statement=statement)
         all_ids = all_ids_iterator.all()
+        all_ids = [x[0] for x in all_ids]
         return all_ids
 
     @staticmethod
     async def _create_id(string: str):
         return sha256(string.encode()).hexdigest()[0:LENGTH]
+
+    @staticmethod
+    async def _create_record(db: AsyncSession, record: RecordModel):
+        """Just create a record without any checks"""
+        db.add(record)
+        await db.commit()
+        await asyncio.sleep(0.25)
+        return True
 
     @staticmethod
     async def create_record(db: AsyncSession, link: UrlModel | str):
@@ -39,7 +48,10 @@ class CRUD:
         MAX_ATTEMPTS = 128
         count = MAX_ATTEMPTS
 
+        all_ids = str(await CRUD._all_ids(db=db))
+        logger.debug('_all_ids: %s', all_ids)
         while id in await CRUD._all_ids(db=db):
+            # hashsum of hashsum is a different value
             id = await CRUD._create_id(id)
             count -= 1
             if count == 0:
@@ -51,9 +63,8 @@ class CRUD:
         http_url = UrlModel(url=url)
         record = RecordModel(url_id=id, url_full=http_url.url, used=0, deprecated=False)
 
-        db.add(record)
-        await db.commit()
-        await asyncio.sleep(0.25)
+        status = await CRUD._create_record(db, record)
+        assert status is True
 
         record_read = await CRUD._read_record(db, id)
 
@@ -82,26 +93,30 @@ class CRUD:
                 status_code=404, detail=f'There is no a link with this id {id_}'
             )
 
-        async with db as session:
-            statement = select(RecordModel).where(RecordModel.url_id == id_)
-            records = await session.execute(statement)
-            record = records.first()
-            print('line 75 ', record)
-
-            print('l87 all_ids:', await CRUD._all_ids_future(db=db))
-
-        record = DB.data[id_]
+        record = await CRUD._read_record(db, id_)
 
         if record.deprecated is True:
             raise HTTPException(
                 status_code=410,
                 detail=f'Gone. This short link {id_} is deprecated forever',
             )
-        # it's needed to update `used` in a database
-        if incr:
-            DB.data[id_].used += 1
 
-        return DB.data[id_]
+        if incr:
+            record.used += 1
+            status = await CRUD._update_record(db, record)
+            assert status is True
+            # record = await CRUD._read_record(db, record.url_id)
+
+        return record
+
+    @staticmethod
+    async def _update_record(db: AsyncSession, record: RecordModel):
+        """update function for in-class use"""
+        db.add(record)
+        await db.commit()
+        # await db.refresh(record)
+        await asyncio.sleep(0.25)
+        return True
 
     @staticmethod
     async def deprecate_record(db: AsyncSession, id_: IdModel | str):
@@ -109,7 +124,11 @@ class CRUD:
             raise HTTPException(
                 status_code=404, detail=f'There is no a link with this id {id_}'
             )
+        record = await CRUD._read_record(db, id_)
 
-        DB.data[id_].deprecated = True
+        record.deprecated = True
 
-        return DB.data[id_]
+        status = await CRUD._update_record(db, record)
+        assert status is True
+
+        return 200

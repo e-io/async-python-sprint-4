@@ -3,7 +3,6 @@ import logging
 from asyncio import sleep
 
 import httpx
-import requests
 from httpx import AsyncClient
 from pytest import fixture, mark
 
@@ -102,6 +101,7 @@ async def test_post_and_get(url_example):
 
     route = '/link' + '?url_id=' + url_id
     logger.debug('get route %s', route)
+
     response = await client.get(route)
     assert response.status_code == 307
     url_dict = response.json()
@@ -114,8 +114,7 @@ async def test_post_and_get(url_example):
 async def test_info(url_example):
     response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+    record = response.json()
     url_id = record['url_id']
 
     route = '/info' + '?url_id=' + url_id
@@ -134,8 +133,7 @@ async def test_info(url_example):
 async def test_deprecated(url_example):
     response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+    record = response.json()
     url_id = record['url_id']
 
     route = '/deprecate' + '?url_id=' + url_id
@@ -144,4 +142,5 @@ async def test_deprecated(url_example):
 
     route = '/link' + '?url_id=' + url_id
     response = await client.get(route)
-    assert response.status_code == 410  # as it should be
+    # '410' should be for a deprecated link. not 200.
+    assert response.status_code == 410

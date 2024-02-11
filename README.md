@@ -53,9 +53,14 @@ echo "DATABASE_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/postgre
 
 **Run server**
 ```bash
- uvicorn src.main:app --host 127.0.0.1 --port 8080 --reload
+uvicorn src.main:app \
+--host 127.0.0.1 \
+--port 8080 \
+--reload \
+--reload-include src
 ```
 _Note: 0.0.0.0 may not work in Safari browser_
+`--reload-exclude tests` requires watchgod installed. Otherwise, run without this line (flag).
 
 ## How to test
 
