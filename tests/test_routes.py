@@ -4,9 +4,9 @@ from asyncio import sleep
 
 from httpx import AsyncClient
 from main import app
-from pytest import fixture
+from pytest import fixture, mark
 
-client = AsyncClient(app=app, base_url='/')
+client = AsyncClient(base_url='http://127.0.0.1:8080/')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -38,9 +38,9 @@ def not_urls():
     ]
     return _not_urls
 
-
-def test_get_hello():
-    response = client.get('/hello')
+@mark.asyncio
+async def test_get_hello():
+    response = await client.get('/hello')
     assert response.status_code == 200
     assert response.json() == {'hello': 'world'}
 
@@ -52,7 +52,7 @@ def test_get_abracadabra():
         'next page is asked but it does not exist': 'abracadabra'
     }
 
-
+@mark.asyncio
 async def test_post_url(url_example):
     async with client:
         logger.debug('URL example: %s', url_example)
@@ -61,7 +61,7 @@ async def test_post_url(url_example):
             headers={},
             json={'url': url_example}
         )
-        sleep(1)
+        await sleep(1)
         assert response.status_code == 201
         record_as_string = response.json()  # response.json() has a type <str>! (not dict)
         record = json.loads(record_as_string)

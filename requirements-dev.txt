@@ -1,7 +1,3 @@
-# for testing
-pytest
-pytest-asyncio
-
 # for running a server and rerun aut. with any edits done
 watchgod
 
