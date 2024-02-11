@@ -3,7 +3,6 @@ import logging
 from asyncio import sleep
 
 from httpx import AsyncClient
-from main import app
 from pytest import fixture, mark
 
 client = AsyncClient(base_url='http://127.0.0.1:8080/')
@@ -17,14 +16,16 @@ logger.addHandler(logging.StreamHandler())
 def url_example():
     return 'https://example.com'
 
+
 @fixture
-def url_several():
+def url_examples():
     _urls = [
         'https://example.com/contacts',
-        'https://example.com/info?key=true&list=10',
         'http://example.com/a/b',
+        'https://example.com/info?key=true&list=10',
     ]
     return _urls
+
 
 @fixture
 def not_urls():
@@ -37,6 +38,7 @@ def not_urls():
         'http://example .com',
     ]
     return _not_urls
+
 
 @mark.asyncio
 async def test_get_hello():
@@ -52,27 +54,26 @@ def test_get_abracadabra():
         'next page is asked but it does not exist': 'abracadabra'
     }
 
+
 @mark.asyncio
-async def test_post_url(url_example):
-    async with client:
+async def test_post_url(url_examples):
+    for url_example in url_examples:
         logger.debug('URL example: %s', url_example)
-        response = await client.post(
-            '/shorten/',
-            headers={},
-            json={'url': url_example}
-        )
+        response = await client.post('/shorten/', headers={}, json={'url': url_example})
         await sleep(1)
         assert response.status_code == 201
-        record_as_string = response.json()  # response.json() has a type <str>! (not dict)
+        record_as_string = (
+            response.json()
+        )  # response.json() has a type <str>! (not dict)
         record = json.loads(record_as_string)
 
-    logger.debug(type(record))  # dict
-    logger.debug(record)
+        logger.debug(type(record))  # dict
+        logger.debug(record)
 
-    assert record['url_full'] == url_example
-    assert 'url_id' in record
-    assert isinstance(record['used'], int)
-    assert record['deprecated'] is False
+        assert record['url_full'] == url_example
+        assert 'url_id' in record
+        assert isinstance(record['used'], int)
+        assert record['deprecated'] is False
 
 
 def test_post_not_urls(not_urls):

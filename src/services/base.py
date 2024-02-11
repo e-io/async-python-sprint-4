@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from hashlib import sha256
 
+import sqlalchemy
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from src.models.base import LENGTH, IdModel, RecordModel, UrlModel
+
+logger = logging.getLogger(__name__)
+logger.setLevel('DEBUG')
 
 
 class DB:
@@ -16,37 +21,26 @@ class DB:
 
 class CRUD:
     @staticmethod
-    async def _all_ids_future(db: AsyncSession):
-        async with db as session:
-            statement = select([RecordModel.url_id])
-            all_ids_iterator = await session.execute(statement=statement)
-            all_ids = all_ids_iterator.all()
-            # all_ids = DB.data.keys()
-            return all_ids
-
-    @staticmethod
     async def _all_ids(db: AsyncSession):
-        async with db as session:
-            statement = select([RecordModel.url_id])
-            all_ids_iterator = await session.execute(statement=statement)
-            all_ids = all_ids_iterator.all()
-            all_ids = DB.data.keys()
-            return all_ids
+        statement = select([RecordModel.url_id])
+        all_ids_iterator = await db.execute(statement=statement)
+        all_ids = all_ids_iterator.all()
+        return all_ids
 
     @staticmethod
-    def _create_id(string: str):
+    async def _create_id(string: str):
         return sha256(string.encode()).hexdigest()[0:LENGTH]
 
     @staticmethod
     async def create_record(db: AsyncSession, link: UrlModel | str):
         # id is a short link
         url = link.url if isinstance(link, UrlModel) else link
-        id = CRUD._create_id(url)
+        id = await CRUD._create_id(url)
         MAX_ATTEMPTS = 128
         count = MAX_ATTEMPTS
 
         while id in await CRUD._all_ids(db=db):
-            id = CRUD._create_id(id)
+            id = await CRUD._create_id(id)
             count -= 1
             if count == 0:
                 raise HTTPException(
@@ -57,13 +51,24 @@ class CRUD:
         http_url = UrlModel(url=url)
         record = RecordModel(url_id=id, url_full=http_url.url, used=0, deprecated=False)
 
-        async with db as session:
-            session.add(record)
-            await session.commit()
-            await asyncio.sleep(0.25)
+        db.add(record)
+        await db.commit()
+        await asyncio.sleep(0.25)
 
-        DB.data[id] = record
-        return DB.data[id]
+        record_read = await CRUD._read_record(db, id)
+
+        return record_read
+
+    @staticmethod
+    async def _read_record(db: AsyncSession, id_: IdModel | str) -> RecordModel:
+        # just a simple read from database WITHOUT any checks
+        statement = select(RecordModel).where(RecordModel.url_id == id_)
+        rows = await db.execute(statement)
+        row: sqlalchemy.engine.row.Row = rows.first()
+        assert isinstance(row, sqlalchemy.engine.row.Row)
+        record = row['RecordModel']
+        logger.debug(record.json())
+        return record
 
     @staticmethod
     async def read_record(db: AsyncSession, id_: IdModel | str, incr=True):
