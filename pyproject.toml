@@ -1,5 +1,5 @@
 [tool.pytest.ini_options]
-addopts = '-sv'
+addopts = '-sv tests/test_routes.py::test_post_url'
 pythonpath = 'src/'
 
 [tool.ruff.lint]

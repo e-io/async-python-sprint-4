@@ -1,6 +1,11 @@
+# for testing
+pytest
+pytest-asyncio
 
+# for running a server and rerun aut. with any edits done
+watchgod
+
+# for clear code
 flake8
 mypy
 ruff
-watchgod==0.8.2
-

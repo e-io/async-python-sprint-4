@@ -1,12 +1,12 @@
 import json
 import logging
-from time import sleep
+from asyncio import sleep
 
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from main import app
 from pytest import fixture
 
-client = TestClient(app)
+client = AsyncClient(app=app, base_url='/')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -53,13 +53,19 @@ def test_get_abracadabra():
     }
 
 
-def test_post_url(url_example):
-    logger.debug('URL example: %s', url_example)
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
-    sleep(1)
-    assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+async def test_post_url(url_example):
+    async with client:
+        logger.debug('URL example: %s', url_example)
+        response = await client.post(
+            '/shorten/',
+            headers={},
+            json={'url': url_example}
+        )
+        sleep(1)
+        assert response.status_code == 201
+        record_as_string = response.json()  # response.json() has a type <str>! (not dict)
+        record = json.loads(record_as_string)
+
     logger.debug(type(record))  # dict
     logger.debug(record)
 

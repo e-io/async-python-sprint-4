@@ -26,6 +26,8 @@ Rancher Desktop will install a required software by itself.
 
 Rancher Desktop --> Settings --> Container engine --> dockerd (moby)
 
+If it's installed, just open it, and Rancher Desktop will run a virtual machine. 
+
 Run a container for PostgreSQL by a following command (just in a standard terminal):
 ```bash
 docker run \
