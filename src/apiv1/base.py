@@ -28,8 +28,9 @@ async def shorten_link(*, db: AsyncSession = Depends(get_session), link: UrlMode
     except ValidationError:
         raise HTTPException(status_code=422, detail='Input data is not a link')
     record: RecordModel = await CRUD.create_record(db=db, link=link)
-
-    return record.json()
+    assert isinstance(record, RecordModel)
+    # just for a check. Answer '200' is enough in reality
+    return json.loads(record.json())
 
 
 @router.get('/link', status_code=307)

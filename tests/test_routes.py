@@ -2,6 +2,8 @@ import json
 import logging
 from asyncio import sleep
 
+import httpx
+import requests
 from httpx import AsyncClient
 from pytest import fixture, mark
 
@@ -14,7 +16,7 @@ logger.addHandler(logging.StreamHandler())
 
 @fixture
 def url_example():
-    return 'https://example.com'
+    return 'https://example.com/info?key=true&list=10'
 
 
 @fixture
@@ -47,8 +49,8 @@ async def test_get_hello():
     assert response.json() == {'hello': 'world'}
 
 
-def test_get_abracadabra():
-    response = client.get('/abracadabra')
+async def test_get_abracadabra():
+    response = await client.get('/abracadabra')
     assert response.status_code == 200
     assert response.json() == {
         'next page is asked but it does not exist': 'abracadabra'
@@ -62,10 +64,7 @@ async def test_post_url(url_examples):
         response = await client.post('/shorten/', headers={}, json={'url': url_example})
         await sleep(1)
         assert response.status_code == 201
-        record_as_string = (
-            response.json()
-        )  # response.json() has a type <str>! (not dict)
-        record = json.loads(record_as_string)
+        record = response.json()  # dict
 
         logger.debug(type(record))  # dict
         logger.debug(record)
@@ -76,12 +75,12 @@ async def test_post_url(url_examples):
         assert record['deprecated'] is False
 
 
-def test_post_not_urls(not_urls):
+@mark.asyncio
+async def test_post_not_urls(not_urls):
     for not_url in not_urls:
-        response = client.post('/shorten/', headers={}, json={'url': not_url})
+        response = await client.post('/shorten/', headers={}, json={'url': not_url})
 
-        # is not true for the last libraries OR python 3.11
-        # assert isinstance(response, requests.models.Response)
+        assert isinstance(response, httpx.Response)
         assert response.status_code == 422
 
         response_dict = json.loads(response.text)
@@ -90,12 +89,12 @@ def test_post_not_urls(not_urls):
         logger.debug('%s%s%s', response_dict['type'], ': ', response_dict['msg'])
 
 
-def test_post_and_get(url_example):
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
+@mark.asyncio
+async def test_post_and_get(url_example):
+    response = await client.post('/shorten/', headers={}, json={'url': url_example})
 
     assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+    record = response.json()
 
     assert record['url_full'] == url_example
     url_id = record['url_id']
@@ -103,7 +102,7 @@ def test_post_and_get(url_example):
 
     route = '/link' + '?url_id=' + url_id
     logger.debug('get route %s', route)
-    response = client.get(route)
+    response = await client.get(route)
     assert response.status_code == 307
     url_dict = response.json()
     url_full = url_dict['url_full']
@@ -111,8 +110,9 @@ def test_post_and_get(url_example):
     assert url_full == url_example
 
 
-def test_info(url_example):
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
+@mark.asyncio
+async def test_info(url_example):
+    response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
     record_as_string = response.json()  # response.json() has a type <str>! (not dict)
     record = json.loads(record_as_string)
@@ -120,7 +120,7 @@ def test_info(url_example):
 
     route = '/info' + '?url_id=' + url_id
     logger.debug('get route %s', route)
-    response = client.get(route)
+    response = await client.get(route)
     assert response.status_code == 200
     record_dict = response.json()
     assert record_dict['url_full'] == url_example
@@ -130,17 +130,18 @@ def test_info(url_example):
     assert record_dict['url_id'] == url_id
 
 
-def test_deprecated(url_example):
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
+@mark.asyncio
+async def test_deprecated(url_example):
+    response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
     record_as_string = response.json()  # response.json() has a type <str>! (not dict)
     record = json.loads(record_as_string)
     url_id = record['url_id']
 
     route = '/deprecate' + '?url_id=' + url_id
-    response = client.patch(route)
+    response = await client.patch(route)
     assert response.status_code == 200
 
     route = '/link' + '?url_id=' + url_id
-    response = client.get(route)
+    response = await client.get(route)
     assert response.status_code == 410  # as it should be
