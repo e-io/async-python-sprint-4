@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+class Init:
+    init = False
 
 async def prepare_engine(dsn: str, echo=False):
     engine = create_async_engine(
@@ -14,8 +16,10 @@ async def prepare_engine(dsn: str, echo=False):
 
     # init models
     async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.drop_all)
-        await conn.run_sync(SQLModel.metadata.create_all)
+        if Init.init is False:
+            await conn.run_sync(SQLModel.metadata.drop_all)
+            await conn.run_sync(SQLModel.metadata.create_all)
+            Init.init = True
 
     return engine
 
