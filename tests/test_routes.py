@@ -1,21 +1,34 @@
 import json
 import logging
-from time import sleep
+from asyncio import sleep
 
-from fastapi.testclient import TestClient
-from main import app
-from pytest import fixture
-
-client = TestClient(app)
+import httpx
+from httpx import AsyncClient
+from pytest import fixture, mark
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
+@fixture
+def client():
+    _client = AsyncClient(base_url='http://127.0.0.1:8080/')
+    return _client
+
 
 @fixture
 def url_example():
-    return 'https://example.com'
+    return 'https://example.com/info?key=true&list=10'
+
+
+@fixture
+def url_examples():
+    _urls = [
+        'https://example.com/contacts',
+        'http://example.com/a/b',
+        'https://example.com/info?key=true&list=10',
+    ]
+    return _urls
 
 
 @fixture
@@ -31,42 +44,45 @@ def not_urls():
     return _not_urls
 
 
-def test_get_hello():
-    response = client.get('/hello')
+@mark.asyncio
+async def test_get_hello(client):
+    response = await client.get('/hello')
     assert response.status_code == 200
     assert response.json() == {'hello': 'world'}
 
 
-def test_get_abracadabra():
-    response = client.get('/abracadabra')
+async def test_get_abracadabra(client):
+    response = await client.get('/abracadabra')
     assert response.status_code == 200
     assert response.json() == {
         'next page is asked but it does not exist': 'abracadabra'
     }
 
 
-def test_post_url(url_example):
-    logger.debug('URL example: %s', url_example)
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
-    sleep(1)
-    assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
-    logger.debug(type(record))  # dict
-    logger.debug(record)
+@mark.asyncio
+async def test_post_url(client, url_examples):
+    for url_example in url_examples:
+        logger.debug('URL example: %s', url_example)
+        response = await client.post('/shorten/', headers={}, json={'url': url_example})
+        await sleep(1)
+        assert response.status_code == 201
+        record = response.json()  # dict
 
-    assert record['url_full'] == url_example
-    assert 'url_id' in record
-    assert isinstance(record['used'], int)
-    assert record['deprecated'] is False
+        logger.debug(type(record))  # dict
+        logger.debug(record)
+
+        assert record['url_full'] == url_example
+        assert 'url_id' in record
+        assert isinstance(record['used'], int)
+        assert record['deprecated'] is False
 
 
-def test_post_not_urls(not_urls):
+@mark.asyncio
+async def test_post_not_urls(client, not_urls):
     for not_url in not_urls:
-        response = client.post('/shorten/', headers={}, json={'url': not_url})
+        response = await client.post('/shorten/', headers={}, json={'url': not_url})
 
-        # is not true for the last libraries OR python 3.11
-        # assert isinstance(response, requests.models.Response)
+        assert isinstance(response, httpx.Response)
         assert response.status_code == 422
 
         response_dict = json.loads(response.text)
@@ -75,12 +91,12 @@ def test_post_not_urls(not_urls):
         logger.debug('%s%s%s', response_dict['type'], ': ', response_dict['msg'])
 
 
-def test_post_and_get(url_example):
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
+@mark.asyncio
+async def test_post_and_get(client, url_example):
+    response = await client.post('/shorten/', headers={}, json={'url': url_example})
 
     assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+    record = response.json()
 
     assert record['url_full'] == url_example
     url_id = record['url_id']
@@ -88,7 +104,8 @@ def test_post_and_get(url_example):
 
     route = '/link' + '?url_id=' + url_id
     logger.debug('get route %s', route)
-    response = client.get(route)
+
+    response = await client.get(route)
     assert response.status_code == 307
     url_dict = response.json()
     url_full = url_dict['url_full']
@@ -96,16 +113,16 @@ def test_post_and_get(url_example):
     assert url_full == url_example
 
 
-def test_info(url_example):
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
+@mark.asyncio
+async def test_info(client, url_example):
+    response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+    record = response.json()
     url_id = record['url_id']
 
     route = '/info' + '?url_id=' + url_id
     logger.debug('get route %s', route)
-    response = client.get(route)
+    response = await client.get(route)
     assert response.status_code == 200
     record_dict = response.json()
     assert record_dict['url_full'] == url_example
@@ -115,17 +132,18 @@ def test_info(url_example):
     assert record_dict['url_id'] == url_id
 
 
-def test_deprecated(url_example):
-    response = client.post('/shorten/', headers={}, json={'url': url_example})
+@mark.asyncio
+async def test_deprecated(client, url_example):
+    response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
-    record_as_string = response.json()  # response.json() has a type <str>! (not dict)
-    record = json.loads(record_as_string)
+    record = response.json()
     url_id = record['url_id']
 
     route = '/deprecate' + '?url_id=' + url_id
-    response = client.patch(route)
+    response = await client.patch(route)
     assert response.status_code == 200
 
     route = '/link' + '?url_id=' + url_id
-    response = client.get(route)
-    assert response.status_code == 410  # as it should be
+    response = await client.get(route)
+    # '410' should be for a deprecated link. not 200.
+    assert response.status_code == 410

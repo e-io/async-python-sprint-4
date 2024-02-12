@@ -1,6 +1,6 @@
 # URLer - Uniform Resource Locator shortener.
 
-## How to start
+## How to prepare environment
 
 Use python 3.10 or 3.11.
 
@@ -14,20 +14,53 @@ Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
-The module `uvloop==0.14.0` is not being installed with python 3.11 due to an error `Could not build wheels for uvloop`.
-But it works with 3.10.
+
+
+## How to prepare a database
+
+Install PostgreSQL from the official site with an elephant as the logo.
+
+Install Rancher Desktop (or another similar software).
+
+Rancher Desktop will install a required software by itself.
+
+Rancher Desktop --> Settings --> Container engine --> dockerd (moby)
+
+If it's installed, just open it, and Rancher Desktop will run a virtual machine. 
+
+Run a container for PostgreSQL by a following command (just in a standard terminal):
+```bash
+docker run \
+  --rm   \
+  --name postgres-fastapi \
+  -p 5432:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=collection \
+  -d postgres:14.5
+```
+Use these username and password only for a local running. For a real server choose more sophisticated password.
 
 Create `.env` file in the root of project with `PROJECT_NAME='Your-name-for-this-project'`
 ```bash
 touch .env
 echo "PROJECT_NAME='URLer'" > .env
+echo "DATABASE_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/postgres" > .env
 ```
+
+
+## How to run
 
 **Run server**
 ```bash
- uvicorn src.main:app --host 127.0.0.1 --port 8080
+uvicorn src.main:app \
+--host 127.0.0.1 \
+--port 8080 \
+--reload \
+--reload-include src
 ```
 _Note: 0.0.0.0 may not work in Safari browser_
+`--reload-exclude tests` requires watchgod installed. Otherwise, run without this line (flag).
 
 ## How to test
 
@@ -44,6 +77,20 @@ Run all tests by
 pytest
 ```
 or create your own tests in `tests` folder. You may use tests in `test_routes.py` as template for your tests.
+
+### In docker container
+Use the next command to connect to the terminal of runned container
+```bash
+docker exec -it postgres-fastapi psql -U postgres 
+```
+To show all databases
+```bash
+\dt
+```
+To show all records in a database `recordmodel`
+```
+SELECT * FROM recordmodel;
+```
 
 ## A tidy up and a health check
 

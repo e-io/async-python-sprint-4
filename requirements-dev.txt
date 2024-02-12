@@ -1,6 +1,8 @@
-
-flake8
-mypy
-ruff
+# for running a server and rerun aut. with any edits done
 watchgod==0.8.2
 
+# for clear code
+flake8==6.0.0
+mypy==0.991
+mypy-extensions==0.4.3
+ruff
