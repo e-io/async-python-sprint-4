@@ -3,7 +3,6 @@
 # pypi-timemachine 2022-12-01
 # pip install --index-url http://127.0.0.1:60261 -r requirements.txt
 # pip freeze > requirements.txt
-anyio==3.6.2
 asyncpg==0.27.0
 attrs==22.1.0
 certifi==2024.2.2
@@ -21,9 +20,7 @@ packaging==21.3
 pluggy==1.0.0
 pycodestyle==2.10.0
 pydantic==1.10.2
-pyflakes==3.0.1
 pyparsing==3.0.9
-pypi-timemachine==0.2
 pytest==7.2.0
 pytest-asyncio==0.20.2
 python-dotenv==0.21.0
@@ -39,4 +36,3 @@ typing_extensions==4.4.0
 urllib3==2.2.0
 uvicorn==0.20.0
 uvloop==0.17.0
-watchgod==0.8.2

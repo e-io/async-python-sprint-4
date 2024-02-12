@@ -1,4 +1,6 @@
-from sqlalchemy.ext.asyncio import create_async_engine
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -8,7 +10,7 @@ class Init:
     init = False
 
 
-async def prepare_engine(dsn: str, echo=False):
+async def prepare_engine(dsn: str, echo: bool = False) -> AsyncEngine:
     engine = create_async_engine(
         dsn,
         echo=echo,
@@ -25,7 +27,7 @@ async def prepare_engine(dsn: str, echo=False):
     return engine
 
 
-async def prepare_session(dsn: str, echo=False):
+async def prepare_session(dsn: str, echo: bool = False) -> sessionmaker:
     engine = await prepare_engine(dsn, echo)
     async_session = sessionmaker(
         engine,
@@ -35,7 +37,7 @@ async def prepare_session(dsn: str, echo=False):
     return async_session
 
 
-async def get_session() -> AsyncSession:
+async def get_session() -> AsyncGenerator:
     dsn = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres'
 
     async_session = await prepare_session(dsn=dsn, echo=False)

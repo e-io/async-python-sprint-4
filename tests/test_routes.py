@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
+
 @fixture
 def client():
     _client = AsyncClient(base_url='http://127.0.0.1:8080/')
@@ -52,11 +53,10 @@ async def test_get_hello(client):
 
 
 async def test_get_abracadabra(client):
-    response = await client.get('/abracadabra')
+    fake_url = 'abracadabra'
+    response = await client.get('/' + fake_url)
     assert response.status_code == 200
-    assert response.json() == {
-        'next page is asked but it does not exist': 'abracadabra'
-    }
+    assert response.json() == {'next page is asked but it does not exist': fake_url}
 
 
 @mark.asyncio
