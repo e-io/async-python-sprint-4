@@ -1,5 +1,5 @@
 [tool.pytest.ini_options]
-addopts = '-sv tests/test_routes.py::test_deprecated'
+addopts = '-sv'
 pythonpath = 'src/'
 asyncio_mode = "auto"
 

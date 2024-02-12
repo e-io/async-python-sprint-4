@@ -6,11 +6,14 @@ import httpx
 from httpx import AsyncClient
 from pytest import fixture, mark
 
-client = AsyncClient(base_url='http://127.0.0.1:8080/')
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
+
+@fixture
+def client():
+    _client = AsyncClient(base_url='http://127.0.0.1:8080/')
+    return _client
 
 
 @fixture
@@ -42,13 +45,13 @@ def not_urls():
 
 
 @mark.asyncio
-async def test_get_hello():
+async def test_get_hello(client):
     response = await client.get('/hello')
     assert response.status_code == 200
     assert response.json() == {'hello': 'world'}
 
 
-async def test_get_abracadabra():
+async def test_get_abracadabra(client):
     response = await client.get('/abracadabra')
     assert response.status_code == 200
     assert response.json() == {
@@ -57,7 +60,7 @@ async def test_get_abracadabra():
 
 
 @mark.asyncio
-async def test_post_url(url_examples):
+async def test_post_url(client, url_examples):
     for url_example in url_examples:
         logger.debug('URL example: %s', url_example)
         response = await client.post('/shorten/', headers={}, json={'url': url_example})
@@ -75,7 +78,7 @@ async def test_post_url(url_examples):
 
 
 @mark.asyncio
-async def test_post_not_urls(not_urls):
+async def test_post_not_urls(client, not_urls):
     for not_url in not_urls:
         response = await client.post('/shorten/', headers={}, json={'url': not_url})
 
@@ -89,7 +92,7 @@ async def test_post_not_urls(not_urls):
 
 
 @mark.asyncio
-async def test_post_and_get(url_example):
+async def test_post_and_get(client, url_example):
     response = await client.post('/shorten/', headers={}, json={'url': url_example})
 
     assert response.status_code == 201
@@ -111,7 +114,7 @@ async def test_post_and_get(url_example):
 
 
 @mark.asyncio
-async def test_info(url_example):
+async def test_info(client, url_example):
     response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
     record = response.json()
@@ -130,7 +133,7 @@ async def test_info(url_example):
 
 
 @mark.asyncio
-async def test_deprecated(url_example):
+async def test_deprecated(client, url_example):
     response = await client.post('/shorten/', headers={}, json={'url': url_example})
     assert response.status_code == 201
     record = response.json()

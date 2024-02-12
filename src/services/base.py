@@ -15,10 +15,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
 
 
-class DB:
-    data: dict = {}
-
-
 class CRUD:
     @staticmethod
     async def _all_ids(db: AsyncSession):
