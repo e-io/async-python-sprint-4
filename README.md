@@ -49,7 +49,6 @@ Create `.env` file in the root of project with `PROJECT_NAME='Your-name-for-this
 ```bash
 touch .env
 echo "PROJECT_NAME='URLer'" > .env
-echo "DATABASE_DSN=postgresql+asyncpg://postgres:postgres@localhost:5432/postgres" > .env
 ```
 
 
