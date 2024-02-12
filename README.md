@@ -2,7 +2,7 @@
 
 ## How to prepare environment
 
-Use python 3.10 or 3.11.
+A projects works well with python 3.11. Other version were not tested.
 
 Create virtual environment
 ```bash
@@ -14,7 +14,10 @@ Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
-
+Also, you may install additional dependencies (they are set for testing and refactoring purposes).
+```bash
+pip install -r requirements-dev.txt
+```
 
 ## How to prepare a database
 
@@ -23,6 +26,7 @@ Install PostgreSQL from the official site with an elephant as the logo.
 Install Rancher Desktop (or another similar software).
 
 Rancher Desktop will install a required software by itself.
+Projects works well with Kubernetes 1.24.17. 
 
 Rancher Desktop --> Settings --> Container engine --> dockerd (moby)
 
@@ -156,15 +160,15 @@ GET `/info?url_id=abcd`
  - [x] Опробовать всю магию pydantic - действительно удобный инструмент как о нём ходили слухи
  - [x] Писать Post- и Patch- запросы
  - [x] Поработать с сопутствующими технологиями как uvicorn, FastApi TestClient и др. 
+ - [x] Поработать с базой данных через ORM (в частности, SqlAlchemy) - вместо написаний каноничных SQL-запросов
+ - [x] Внедрить базу данных в свой проект (PostgreSQL)
 
 Хотелось, но не удалось впервые применить (из-за нехватки времени на эти новые технологии):
- - [ ] работу с базой данных через ORM (в частности, SqlAlchemy) - вместо написаний каноничных SQL-запросов
- - [ ] внедрить базу данных в свой проект
- - [ ] понять чем схемы отличаются от моделей
 
-На данный момент в качестве базы данных используется обычный словарь (класс `BD`), 
-в котором ключу-айдишнику сопоставляется запись "базы данных".
+ - [ ] Сделать отдельно схемы (протокол взаимодействия клиентов и сервера) и отдельно модели (взаимодействие ORM и базы данных). 
+ - Вместо этого используется SQLModel, объединяющий эти сущности. Он объединяет Pydantic и SQLAlchemy под единым интерфейсом. Оптимизирован под FastApi.
 
+Также не реализован batch upload ссылок. Но обычный, по одной ссылке, работает отлично.
 
 # Проектное задание четвёртого спринта
 

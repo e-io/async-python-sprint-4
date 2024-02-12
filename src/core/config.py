@@ -9,7 +9,6 @@ from .logger import LOGGING
 logging_config.dictConfig(LOGGING)
 
 BASE_DIR = Path.cwd().parent.parent
-# print('BASE_DIR', BASE_DIR)
 
 
 class AppSettings(BaseSettings):
@@ -17,7 +16,7 @@ class AppSettings(BaseSettings):
     PROJECT_NAME: str = "Default app's name"
 
     class Config:
-        env_file = '.env'
+        env_file: str = '.env'
 
 
 app_settings = AppSettings()

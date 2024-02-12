@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from hashlib import sha256
+from typing import Optional
 
 import sqlalchemy
 from fastapi import HTTPException
@@ -71,7 +72,7 @@ class CRUD:
         # just a simple read from database WITHOUT any checks
         statement = select(RecordModel).where(RecordModel.url_id == id_)
         rows = await db.execute(statement)
-        row: sqlalchemy.engine.row.Row = rows.first()
+        row: Optional[sqlalchemy.engine.row.Row] = rows.first()
         assert isinstance(row, sqlalchemy.engine.row.Row)
         record = row['RecordModel']
         logger.debug(record.json())

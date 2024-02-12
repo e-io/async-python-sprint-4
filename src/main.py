@@ -16,7 +16,7 @@ from src.apiv1 import base as apiv1_base
 from src.core import config
 
 
-def get_application():
+def get_application() -> FastAPI:
     _app = FastAPI(
         title=config.app_settings.PROJECT_NAME,
     )
