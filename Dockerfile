@@ -14,4 +14,6 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements-dev.txt
 
 COPY ./src /code/src
 
+EXPOSE 8080/tcp
+
 CMD ["uvicorn", "src.main:app", "--host", "127.0.0.1", "--port", "8080"]
