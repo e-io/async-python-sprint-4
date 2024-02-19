@@ -1,0 +1,22 @@
+# a draft
+# Файл должен начинаться с тега версии. Используем последнюю.
+version: '3'
+services:
+  backend:
+    build:
+      context: .
+    ports:
+      # Перенаправляем запросы, поступающие к localhost:8080 на порт 8080.
+      # Somehow this port redirection  does not work currently
+      - 8080:8080
+
+  postgres-fastapi:
+    image: postgres:14.5
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: collection
+    depends_on:
+      - backend
